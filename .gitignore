@@ -67,3 +67,4 @@ lcov.info
 # Misc
 *.tgz
 *.zip
+.opushforce.message

@@ -3,7 +3,7 @@
 
 # Cloudflare credentials
 cloudflared/creds.json
-cloudflared/config.yml
+# cloudflared/config.yml
 
 # Log files sinh ra khi chạy
 logs/app/
@@ -68,3 +68,4 @@ lcov.info
 *.tgz
 *.zip
 .opushforce.message
+cloudflared-credentials.json

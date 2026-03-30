@@ -1,5 +1,4 @@
 services:
-
   # ================================================================
   #  CADDY — Reverse proxy + SSL tự động
   #  caddy-docker-proxy: tự đọc Docker labels để tạo route
@@ -17,6 +16,7 @@ services:
       - CADDY_INGRESS_NETWORKS=app_net
     labels:
       caddy.email: "${CADDY_EMAIL}"
+      caddy.auto_https: "off"
     networks: [app_net]
     restart: unless-stopped
 
@@ -26,9 +26,10 @@ services:
   # ================================================================
   cloudflared:
     image: cloudflare/cloudflared:latest
-    command: tunnel run
-    environment:
-      TUNNEL_TOKEN: "${CF_TUNNEL_TOKEN}"
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+      - ./cloudflared-credentials.json:/etc/cloudflared/credentials.json:ro
     networks: [app_net]
     restart: unless-stopped
     depends_on:
@@ -64,12 +65,12 @@ services:
       PORT: "${APP_PORT:-3000}"
       LOG_DIR: "${LOG_DIR:-/app/logs}"
     volumes:
-      - ./logs/app:/app/logs        # log file ghi ra host
+      - ./logs/app:/app/logs
     labels:
-      caddy: "app.${DOMAIN}"
-      caddy.reverse_proxy: "{{upstreams ${APP_PORT:-3000}}}"
-      caddy.basicauth: "/*"
-      caddy.basicauth.${CADDY_AUTH_USER}: "${CADDY_AUTH_HASH}"
+      - "caddy=http://${SUBDOMAIN_APP:-nodejs-my-docker-app}.${DOMAIN}"
+      - "caddy.reverse_proxy={{upstreams ${APP_PORT:-3000}}}"
+      # - "caddy.basic_auth=/*"
+      # - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
     networks: [app_net]
     restart: unless-stopped
 
@@ -83,8 +84,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - portainer_data:/data
     labels:
-      caddy: "${PORTAINER_SUBDOMAIN:-portainer}.${DOMAIN}"
-      caddy.reverse_proxy: "{{upstreams 9000}}"
+      - "caddy=http://${SUBDOMAIN_PORTAINER:-portainer-my-docker-app}.${DOMAIN}"
+      - "caddy.reverse_proxy={{upstreams 9000}}"
     networks: [app_net]
     restart: unless-stopped
 
@@ -96,10 +97,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
-      caddy: "${DOZZLE_SUBDOMAIN:-logs}.${DOMAIN}"
-      caddy.reverse_proxy: "{{upstreams 8080}}"
-      caddy.basicauth: "/*"
-      caddy.basicauth.${CADDY_AUTH_USER}: "${CADDY_AUTH_HASH}"
+      - "caddy=http://${SUBDOMAIN_DOZZLE:-logs-my-docker-app}.${DOMAIN}"
+      - "caddy.reverse_proxy={{upstreams 8080}}"
+      # - "caddy.basic_auth=/*"
+      # - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
     networks: [app_net]
     restart: unless-stopped
 
@@ -110,13 +111,13 @@ services:
     image: filebrowser/filebrowser:latest
     command: --noauth --port 80 --root /srv --database /database/filebrowser.db
     volumes:
-      - ./logs:/srv                         # serve toàn bộ thư mục logs
+      - ./logs:/srv
       - filebrowser_data:/database
     labels:
-      caddy: "${FILEBROWSER_SUBDOMAIN:-files}.${DOMAIN}"
-      caddy.reverse_proxy: "{{upstreams 80}}"
-      caddy.basicauth: "/*"
-      caddy.basicauth.${CADDY_AUTH_USER}: "${CADDY_AUTH_HASH}"
+      - "caddy=http://${SUBDOMAIN_FILEBROWSER:-files-my-docker-app}.${DOMAIN}"
+      - "caddy.reverse_proxy={{upstreams 80}}"
+      # - "caddy.basic_auth=/*"
+      # - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
     networks: [app_net]
     restart: unless-stopped
 

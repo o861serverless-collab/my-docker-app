@@ -2,7 +2,7 @@ tunnel: 489e2742-dc45-4dfb-9acf-3952746d296a
 credentials-file: /etc/cloudflared/credentials.json
 
 ingress:
-  - hostname: "nodejs-my-docker-app.dhrunners.dpdns.org"
+  - hostname: nodejs-my-docker-app.dhrunners.dpdns.org
     service: http://caddy:80
   - hostname: portainer-my-docker-app.dhrunners.dpdns.org
     service: http://caddy:80

@@ -11,7 +11,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+      - name: Npm install
+        env:
+          RTDB_URL: ${{ secrets.RTDB_URL }}
+        run: |
+          npm install -g @tltdh61/dotenvrtdb
+          dotenvrtdb -e .env --pull -eUrl="$RTDB_URL"
 
       - name: Check .env exists
         run: |
@@ -60,7 +66,7 @@ jobs:
 
       - name: Upload docker runtime artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: docker-runtime
           path: artifacts/docker-runtime

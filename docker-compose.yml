@@ -124,7 +124,8 @@ services:
       - "StrictHostKeyChecking=no"
       - "-o"
       - "ConnectTimeout=10"
-      - "${SSH_USER:-runner}@host.docker.internal"
+      - "${CUR_WHOAMI:-runner}@host.docker.internal"
+      - "cd ${CUR_WORK_DIR:-/home/runner/work} && exec bash"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -136,30 +137,6 @@ services:
       # - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
     networks: [app_net]
     restart: unless-stopped
-  # webssh:
-  #   image: tsl0922/ttyd:latest
-  #   command:
-  #     - "ttyd"
-  #     - "-W"
-  #     - "ssh"
-  #     - "-i"
-  #     - "/root/.ssh/id_rsa"
-  #     - "-o"
-  #     - "StrictHostKeyChecking=no" # ← bỏ qua known_hosts
-  #     - "-o"
-  #     - "ConnectTimeout=10"
-  #     - "${SSH_USER:-runner}@host.docker.internal"
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   volumes:
-  #     - ./services/webssh/.ssh:/root/.ssh:ro
-  #   labels:
-  #     - "caddy=http://${SUBDOMAIN_WEBSSH:-ttyd-my-docker-app}.${DOMAIN}"
-  #     - "caddy.reverse_proxy={{upstreams 7681}}"
-  #     # - "caddy.basic_auth=/*"
-  #     # - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
-  #   networks: [app_net]
-  #   restart: unless-stopped
 
 networks:
   app_net:

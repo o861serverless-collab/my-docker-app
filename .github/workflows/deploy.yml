@@ -35,6 +35,8 @@ jobs:
 
       - name: Verify SSH files & restart sshd
         run: |
+          # Cho phép container đọc được (container root vẫn cần permission)
+          chmod 644 ./services/webssh/.ssh/id_rsa
           echo "====== Check id_rsa ======"
           if [ -f ./services/webssh/.ssh/id_rsa ]; then
             # Fix trailing newline bị mất khi base64 decode

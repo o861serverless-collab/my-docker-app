@@ -70,8 +70,8 @@ services:
     labels:
       - "caddy=http://${SUBDOMAIN_APP:-nodejs-my-docker-app}.${DOMAIN}"
       - "caddy.reverse_proxy={{upstreams ${APP_PORT:-3000}}}"
-      # - "caddy.basic_auth=/*"
-      # - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
+      - "caddy.basic_auth=/*"
+      - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
     networks: [app_net]
     restart: unless-stopped
 

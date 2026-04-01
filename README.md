@@ -202,7 +202,6 @@ LOG_DIR=/app/logs
 ```env
 PORTAINER_SUBDOMAIN=portainer
 DOZZLE_SUBDOMAIN=logs
-FILEBROWSER_SUBDOMAIN=files
 ```
 
 Tùy chỉnh subdomain cho từng dịch vụ. Mặc định:

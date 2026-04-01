@@ -5,6 +5,7 @@ Tài liệu này tổng hợp chính xác các điều kiện để workflow `.g
 ## 1) Hiểu workflow hiện tại đang chạy kiểu gì
 
 Workflow deploy của repo này chạy với:
+
 - trigger: `push` vào nhánh `main` hoặc chạy tay bằng `workflow_dispatch`
 - runner: `runs-on: self-hosted`
 
@@ -23,6 +24,7 @@ Workflow deploy của repo này chạy với:
 ## 2.2. Trên máy self-hosted runner
 
 Cần có sẵn:
+
 - Docker Engine
 - Docker Compose plugin (`docker compose`)
 - Git
@@ -55,6 +57,7 @@ cp .env.example .env
 ```
 
 Các biến quan trọng tối thiểu:
+
 - `DOMAIN`
 - `CADDY_EMAIL`
 - `CADDY_AUTH_USER`
@@ -62,7 +65,7 @@ Các biến quan trọng tối thiểu:
 - `CF_TUNNEL_TOKEN`
 - `TS_AUTHKEY`
 - `APP_PORT`, `NODE_ENV`, `LOG_DIR`
-- các subdomain (`PORTAINER_SUBDOMAIN`, `DOZZLE_SUBDOMAIN`, `FILEBROWSER_SUBDOMAIN`)
+- các subdomain (`PORTAINER_SUBDOMAIN`, `DOZZLE_SUBDOMAIN`)
 
 ## 2.4. Dịch vụ ngoài cần chuẩn bị trước
 
@@ -86,6 +89,7 @@ Nếu local chạy ổn mới push lên `main` để Actions deploy tự động
 ## 4) Cách kích hoạt workflow
 
 Có 2 cách:
+
 1. Push commit vào nhánh `main`.
 2. Vào tab Actions → workflow **Deploy Stack** → **Run workflow** (workflow_dispatch).
 

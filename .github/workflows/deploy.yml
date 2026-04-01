@@ -33,6 +33,42 @@ jobs:
             --var=SSH_RUNNER_PUBLIC_KEY_BASE64
           chmod 600 services/webssh/.ssh/id_rsa || true
 
+      # ----------------------------------------------------------------
+      #  2b. Verify SSH files & restart sshd (trên GitHub Actions runner)
+      # ----------------------------------------------------------------
+      - name: Verify SSH files & restart sshd
+        run: |
+          echo "====== Check id_rsa ======"
+          if [ -f ./services/webssh/.ssh/id_rsa ]; then
+            echo "✅ id_rsa exists ($(wc -c < ./services/webssh/.ssh/id_rsa) bytes)"
+            head -1 ./services/webssh/.ssh/id_rsa | grep -q 'BEGIN' \
+              && echo "✅ valid private key format" \
+              || { echo "❌ invalid format"; exit 1; }
+          else
+            echo "❌ id_rsa NOT found"; exit 1
+          fi
+
+          echo "====== Check known_hosts ======"
+          if [ -f ./services/webssh/.ssh/known_hosts ]; then
+            echo "✅ known_hosts exists"
+            cat ./services/webssh/.ssh/known_hosts | sed 's/^/  /'
+          else
+            echo "⚠️  known_hosts not found — SSH sẽ dùng StrictHostKeyChecking=no"
+          fi
+
+          echo "====== Add pubkey vào authorized_keys của runner ======"
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          ssh-keygen -y -f ./services/webssh/.ssh/id_rsa >> ~/.ssh/authorized_keys
+          chmod 600 ~/.ssh/authorized_keys
+          echo "✅ Public key added"
+
+          echo "====== Restart & verify sshd ======"
+          sudo systemctl restart ssh
+          sleep 1
+          sudo systemctl is-active ssh \
+            && echo "✅ sshd is running" \
+            || { echo "❌ sshd failed to start"; exit 1; }
+
       - name: Check .env exists
         run: |
           if [ ! -f .env ]; then

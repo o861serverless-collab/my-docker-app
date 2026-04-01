@@ -113,7 +113,7 @@ services:
   #  ⚠️  Nên bật basic_auth để tránh expose terminal ra public
   # ================================================================
   webssh:
-    image: tsl0922/ttyd:latest
+    build: ./services/webssh # ← đổi image thành build
     command:
       - "ttyd"
       - "-W"
@@ -121,7 +121,7 @@ services:
       - "-i"
       - "/root/.ssh/id_rsa"
       - "-o"
-      - "StrictHostKeyChecking=no" # ← bỏ qua known_hosts
+      - "StrictHostKeyChecking=no"
       - "-o"
       - "ConnectTimeout=10"
       - "${SSH_USER:-runner}@host.docker.internal"
@@ -136,6 +136,30 @@ services:
       # - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
     networks: [app_net]
     restart: unless-stopped
+  # webssh:
+  #   image: tsl0922/ttyd:latest
+  #   command:
+  #     - "ttyd"
+  #     - "-W"
+  #     - "ssh"
+  #     - "-i"
+  #     - "/root/.ssh/id_rsa"
+  #     - "-o"
+  #     - "StrictHostKeyChecking=no" # ← bỏ qua known_hosts
+  #     - "-o"
+  #     - "ConnectTimeout=10"
+  #     - "${SSH_USER:-runner}@host.docker.internal"
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   volumes:
+  #     - ./services/webssh/.ssh:/root/.ssh:ro
+  #   labels:
+  #     - "caddy=http://${SUBDOMAIN_WEBSSH:-ttyd-my-docker-app}.${DOMAIN}"
+  #     - "caddy.reverse_proxy={{upstreams 7681}}"
+  #     # - "caddy.basic_auth=/*"
+  #     # - "caddy.basic_auth.${CADDY_AUTH_USER}=${CADDY_AUTH_HASH}"
+  #   networks: [app_net]
+  #   restart: unless-stopped
 
 networks:
   app_net:

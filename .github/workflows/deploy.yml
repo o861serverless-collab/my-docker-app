@@ -74,11 +74,32 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          & "$env:ProgramFiles\Docker\Docker\DockerCli.exe" -SwitchLinuxEngine
-          Write-Host "Waiting for Linux engine to start..."
-          Start-Sleep -Seconds 15
+          $dockerCli = "$env:ProgramFiles\Docker\Docker\DockerCli.exe"
+          if (Test-Path $dockerCli) {
+            Write-Host "DockerCli.exe found, switching to Linux engine..."
+            & $dockerCli -SwitchLinuxEngine
+            Write-Host "Waiting for Linux engine to start..."
+            Start-Sleep -Seconds 15
+          } else {
+            Write-Host "DockerCli.exe not found (GitHub-hosted runner) — skipping switch"
+          }
           docker info
-          Write-Host "✅ Docker Linux engine ready"
+          $os = (docker info --format '{{.OSType}}' 2>$null)
+          if ($os -eq "linux") {
+            Write-Host "✅ Docker Linux engine ready ($os)"
+          } else {
+            Write-Host "⚠️ Docker OS type: $os"
+            exit 1
+          }
+      # - name: Switch Docker to Linux engine (Windows only)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     & "$env:ProgramFiles\Docker\Docker\DockerCli.exe" -SwitchLinuxEngine
+      #     Write-Host "Waiting for Linux engine to start..."
+      #     Start-Sleep -Seconds 15
+      #     docker info
+      #     Write-Host "✅ Docker Linux engine ready"
 
       # ================================================================
       #  SSH setup — CHỈ chạy trên Linux (webssh cần SSH vào host)

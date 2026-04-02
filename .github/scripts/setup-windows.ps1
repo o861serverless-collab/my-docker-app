@@ -154,7 +154,7 @@ nohup ttyd \
 sleep 2
 
 if pgrep -x ttyd > /dev/null; then
-  echo "ttyd running (PID=\$(pgrep -x ttyd))"
+  echo "ttyd running (PID=`$(pgrep -x ttyd))"
 else
   echo "ttyd failed to start"
   cat /tmp/ttyd.log
